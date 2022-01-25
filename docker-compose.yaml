@@ -3,10 +3,13 @@ services:
 
   mosquitto:
     container_name: mosquitto
-    image: eclipse-mosquitto:2.0.14
-    restart: always
+    build: ./mosquitto/
+    restart: unless-stopped
+    environment:
+      MOSQUITTO_USERNAME: ${MOSQUITTO_USERNAME}
+      MOSQUITTO_PASSWORD: ${MOSQUITTO_PASSWORD}
     volumes:
-      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
     ports:
       - '1883:1883'
       - '9001:9001'
@@ -14,7 +17,12 @@ services:
   telegraf:
     container_name: telegraf
     image: telegraf:1.19.3
-    restart: always
+    restart: unless-stopped
+    environment:
+      MOSQUITTO_USERNAME: ${MOSQUITTO_USERNAME}
+      MOSQUITTO_PASSWORD: ${MOSQUITTO_PASSWORD}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${DOCKER_INFLUXDB_INIT_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     depends_on:
@@ -26,20 +34,32 @@ services:
   influxdb:
     container_name: influxdb
     image: influxdb:2.0
-    restart: always
-    environment: 
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=my-user
-      - DOCKER_INFLUXDB_INIT_PASSWORD=my-password
-      - DOCKER_INFLUXDB_INIT_ORG=my-org
-      - DOCKER_INFLUXDB_INIT_BUCKET=my-bucket
-      - DOCKER_INFLUXDB_INIT_RETENTION=1w
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+    restart: unless-stopped
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: goats
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${DOCKER_INFLUXDB_INIT_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: goats
+      DOCKER_INFLUXDB_INIT_BUCKET: sensor-measurements
+      DOCKER_INFLUXDB_INIT_RETENTION: 1w
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
     volumes:
       - influxdb_data:/var/lib/influxdb2
       - influxdb_config:/etc/influxdb2
     ports:
       - '8086:8086'
+
+  web:
+    container_name: nginx
+    image: nginx:1.21.5
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - telegraf
+      - mosquitto
+    ports:
+      - "80:80"
+      - "443:443"
 
 volumes:
   mosquitto:

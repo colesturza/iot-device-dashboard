@@ -1,36 +1,47 @@
-# simulator device 1 for mqtt message publishing
 import random
-import paho.mqtt.client as paho
 import time
-from datetime import datetime, timezone
 import json
+import os
 
-# hostname
-broker = "localhost"
+import paho.mqtt.client as paho
 
-# port
-port = 1883
-
-
-def on_publish(client, userdata, result):
-    print("Device 1 : Data published.")
-    pass
+from datetime import datetime, timezone
+from paho import mqtt
 
 
-client = paho.Client("device1")
+def on_connect(client, userdata, flags, rc, properties=None):
+    print("CONNACK received with code %s." % rc)
+
+
+def on_publish(client, userdata, mid, properties=None):
+    print("mid: " + str(mid))
+
+
+def on_message(client, userdata, msg):
+    print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
+
+
+client = paho.Client(client_id="device01", userdata=None, protocol=paho.MQTTv5)
+client.on_connect = on_connect
+
+client.username_pw_set(
+    os.environ.get("MOSQUITTO_USERNAME"), os.environ.get("MOSQUITTO_PASSWORD")
+)
+client.connect("localhost", 1883)
+
+client.on_message = on_message
 client.on_publish = on_publish
-client.connect(broker, port)
 
-for i in range(100_000):
-    # telemetry to send
+while True:
+
     message = json.dumps(
         {
             "timestamp": datetime.now(tz=timezone.utc).strftime(
                 "%a %b %-d %H:%M:%S %Z %Y"
             ),
             "metadata": {
-                "device_id": "device01",
-                "sensor_id": "sensor01",
+                "deviceId": "device01",
+                "sensorId": "sensor01",
                 "measurement": "windspeed",
                 "units": "mph",
             },
@@ -40,10 +51,7 @@ for i in range(100_000):
         sort_keys=True,
         default=str,
     )
+
+    client.publish("sensors/data", message)
     time.sleep(1)
-
-    # publish message
-    ret = client.publish("sensors/data", message)
-
-client.disconnect(broker, port)
-print("Stopped...")
+    client.loop()
