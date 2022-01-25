@@ -22,7 +22,7 @@ MOSQUITTO_PASSWORD=pass
 Replace the above with the approaprate credentials. Run the folowing command from the root directory of this project.
 
 ```bash
-docker-compose up
+docker-compose up -d
 ```
 
 ### Kubernetes
