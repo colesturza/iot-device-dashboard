@@ -27,7 +27,7 @@ client.on_connect = on_connect
 client.username_pw_set(
     os.environ.get("MOSQUITTO_USERNAME"), os.environ.get("MOSQUITTO_PASSWORD")
 )
-client.connect("localhost", 1883)
+client.connect("10.0.0.109", 1883)
 
 client.on_message = on_message
 client.on_publish = on_publish
