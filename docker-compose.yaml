@@ -50,7 +50,7 @@ services:
       - '8086:8086'
 
   web:
-    # network_mode: "host"
+    network_mode: "host"
     container_name: nginx
     image: nginx:1.21.5
     volumes:
@@ -58,10 +58,10 @@ services:
     depends_on:
       - mosquitto
       - influxdb
-    ports:
-      - '80:80'
-      - '81:81'
-      - '443:443'
+    # ports:
+    #   - '80:80'
+    #   - '81:81'
+    #   - '443:443'
 
   # nginx-proxy-manager:
   #   network_mode: "host"
