@@ -49,34 +49,32 @@ services:
     ports:
       - '8086:8086'
 
-  # web:
-  #   container_name: nginx
-  #   image: nginx:1.21.5
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-  #   depends_on:
-  #     - telegraf
-  #     - mosquitto
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-
-  nginx-proxy-manager:
+  web:
     network_mode: "host"
-    image: 'jc21/nginx-proxy-manager:latest'
-    restart: unless-stopped
-    ports:
-      - '80:80'
-      - '81:81'
-      - '443:443'
+    container_name: nginx
+    image: nginx:1.21.5
     volumes:
-      - nginx-proxy-manager-data:/data
-      - nginx-proxy-manager-letsencrypt:/etc/letsencrypt
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - telegraf
+      - mosquitto
+
+  # nginx-proxy-manager:
+  #   network_mode: "host"
+  #   image: 'jc21/nginx-proxy-manager:latest'
+  #   restart: unless-stopped
+  #   ports:
+  #     - '80:80'
+  #     - '81:81'
+  #     - '443:443'
+  #   volumes:
+  #     - nginx-proxy-manager-data:/data
+  #     - nginx-proxy-manager-letsencrypt:/etc/letsencrypt
 
 volumes:
   mosquitto:
   telegraf:
   influxdb-data:
   influxdb-config:
-  nginx-proxy-manager-data:
-  nginx-proxy-manager-letsencrypt:
+  # nginx-proxy-manager-data:
+  # nginx-proxy-manager-letsencrypt:
