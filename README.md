@@ -22,7 +22,7 @@ MOSQUITTO_PASSWORD=pass
 Replace the above with the approaprate credentials. Run the folowing command from the root directory of this project.
 
 ```bash
-docker-compose up
+docker-compose up -d
 ```
 
 ### Kubernetes
@@ -31,4 +31,27 @@ TODO
 
 ## Simulate Data with the `emulate` Directory
 
-You will need to export your environmental variables 
+First create and activate your virtualenv - with the `venv` package on OSX or Linux, this will be:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+With your virtualenv active, install the project locally:
+
+```bash
+pip install ./emulate/requirements.txt
+```
+
+Second you will need to export the environmental variables, this can be don with:
+
+```bash
+export $(grep -v '^#' .env | xargs -d '\n')
+```
+
+Finally, run the python script with:
+
+```bash
+python ./emulate/mqtt_publisher.py
+```
