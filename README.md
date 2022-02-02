@@ -41,7 +41,7 @@ source venv/bin/activate
 With your virtualenv active, install the project locally:
 
 ```bash
-pip install ./emulate/requirements.txt
+pip install -r ./emulate/requirements.txt
 ```
 
 Second you will need to export the environmental variables, this can be don with:

@@ -21,7 +21,7 @@ def on_message(client, userdata, msg):
     print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
 
 
-client = paho.Client(client_id="device01", userdata=None, protocol=paho.MQTTv5)
+client = paho.Client(client_id="deviceEmulator01", userdata=None, protocol=paho.MQTTv5)
 client.on_connect = on_connect
 
 client.username_pw_set(
@@ -39,19 +39,18 @@ while True:
             "timestamp": datetime.now(tz=timezone.utc).strftime(
                 "%a %b %-d %H:%M:%S %Z %Y"
             ),
-            "metadata": {
-                "deviceId": "device01",
-                "sensorId": "sensor01",
-                "measurement": "windspeed",
-                "units": "mph",
-            },
-            "value": random.randrange(25, 35, 1),
+            "xAcc": random.randrange(25, 35, 1),
+            "yAcc": random.randrange(25, 35, 1),
+            "zAcc": random.randrange(25, 35, 1),
+            "alphaAcc": random.randrange(25, 35, 1),
+            "betaAcc": random.randrange(25, 35, 1),
+            "omegaAcc": random.randrange(25, 35, 1),
         },
         indent=4,
         sort_keys=True,
         default=str,
     )
 
-    client.publish("sensors/data", message)
+    client.publish("devices/deviceEmulator01/sensorData", message)
     time.sleep(1)
     client.loop()
