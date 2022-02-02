@@ -61,6 +61,7 @@ services:
       DOCKER_INFLUXDB_INIT_ORG: goates
       DOCKER_INFLUXDB_INIT_BUCKET: sensor-measurements
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}    
+      GF_DASHBOARDS_MIN_REFRESH_INTERVAL: 1s
     depends_on:
       - influxdb
     volumes:
